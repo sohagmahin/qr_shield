@@ -1,31 +1,37 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from "react-native";
+import { Text, View } from "../../components/Themed";
+import QRCode from "react-native-qrcode-svg";
+import Barcode from "@kichiyaki/react-native-barcode-generator";
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
+export default function CodesScreen() {
+  const qrCodes = (
+    <View className="flex flex-row justify-between p-6 m-1">
+      <View>
+        <Text className="text-red-400">Name</Text>
+        <Text>Description</Text>
+      </View>
+      <QRCode value="http://awesome.link.qr" size={50} />
+    </View>
+  );
 
-export default function TabOneScreen() {
+  const barCodes = (
+    <View className="flex flex-col justify-between p-6 m-1">
+      <View>
+        <Text className="text-red-400">Name</Text>
+        <Text>Description</Text>
+      </View>
+      <Barcode
+        format="EAN13"
+        value="0123456789012"
+        text="0123456789012"
+        maxWidth={Dimensions.get("window").width / 2}
+      />
+    </View>
+  );
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View className="m-4 bg-[#F2F2F2]">
+      {qrCodes}
+      {barCodes}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});

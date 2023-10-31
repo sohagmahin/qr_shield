@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Pressable, ScrollView } from "react-native";
 import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
@@ -9,6 +9,7 @@ import {
   insertItem,
   openDatabase,
 } from "../../services/db";
+import { Link, router } from "expo-router";
 
 type Item = {
   id: number;
@@ -24,7 +25,7 @@ export default function CodesScreen() {
     const db = openDatabase();
     createTable();
 
-    insertItem("sohag", "test description", "qr", "http://awesome.link.qr");
+    // insertItem("sohag", "test description", "qr", "http://awesome.link.qr");
 
     getItems().then((items: any) => {
       console.log(items);
@@ -62,11 +63,28 @@ export default function CodesScreen() {
     </View>
   );
   return (
-    <View className="m-4 bg-[#F2F2F2]">
+    <ScrollView className="m-4 bg-[#F2F2F2]">
       {items.map((item) => {
-        return qrCodes(item);
+        return (
+          <Pressable
+            key={item.id}
+            onPress={() => {
+              router.push({
+                pathname: "/qr_modal",
+                params: { id: item.id },
+              });
+            }}
+          >
+            {qrCodes(item)}
+          </Pressable>
+        );
       })}
+      {items.length === 0 && (
+        <View className="flex items-center justify-center bg-transparent">
+          <Text className="text-3xl font-bold">No items found</Text>
+        </View>
+      )}
       {/* {barCodes} */}
-    </View>
+    </ScrollView>
   );
 }

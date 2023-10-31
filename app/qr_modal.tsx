@@ -1,0 +1,86 @@
+import { StatusBar } from "expo-status-bar";
+import { Platform, TextInput, Button, Alert } from "react-native";
+import { Text, View } from "../components/Themed";
+import { router, useLocalSearchParams } from "expo-router";
+import QRCode from "react-native-qrcode-svg";
+import { deleteItem, getItem, getItems } from "../services/db";
+import { useEffect, useState } from "react";
+
+type Item = {
+  id: number;
+  name: string;
+  description: string;
+  type: string;
+  data: string;
+};
+
+export default function QRModalScreen() {
+  const [item, setItem] = useState<Item>();
+  const local = useLocalSearchParams();
+  const { id } = local;
+
+  const removeItem = (id: number) => {
+    deleteItem(id);
+  };
+
+  const showDeleteAlret = () => {
+    Alert.alert(
+      "Delete",
+      "Are you sure you want to delete this item?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+
+        { text: "OK", onPress: () => removeItem(item?.id as number) },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    // getItem(parseInt(id.toString()));
+    getItem(parseInt(id.toString())).then((item: any) => {
+      console.log("itemss ========>>>>");
+      console.log(item);
+      setItem(item);
+    });
+  }, [id]);
+  return (
+    <View className="flex items-center h-full">
+      {item ? (
+        <View className="flex flex-col">
+          <View className="flex flex-row justify-between w-screen px-5 py-2">
+            <Text
+              onPress={() => showDeleteAlret()}
+              className="text-lg font-normal"
+            >
+              Delete
+            </Text>
+            <Text
+              onPress={() =>
+                router.push({
+                  pathname: "/modal",
+                  params: { data: item?.data },
+                })
+              }
+              className="text-lg font-normal"
+            >
+              Edit
+            </Text>
+          </View>
+          <View className="flex items-center justify-center flex-grow">
+            <QRCode value={item.data.toString()} size={300} />
+            <Text className="mt-5 text-3xl font-bold">{item.name}</Text>
+          </View>
+        </View>
+      ) : (
+        <Text>loading</Text>
+      )}
+      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+    </View>
+  );
+}

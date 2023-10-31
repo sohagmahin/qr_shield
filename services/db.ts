@@ -63,6 +63,17 @@ export function getItems() {
   });
 }
 
+export function getItem(id: number) {
+  const db = openDatabase();
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql("select * from items where id = ?", [id], (_, { rows }) => {
+        resolve(rows.item(0));
+      });
+    });
+  });
+}
+
 //close db
 export function closeDatabase() {
   const db = openDatabase();

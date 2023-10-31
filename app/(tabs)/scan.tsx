@@ -5,7 +5,7 @@ import { router } from "expo-router";
 
 const ScanScreen = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
+  const [scanned, setScanned] = useState(true);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {

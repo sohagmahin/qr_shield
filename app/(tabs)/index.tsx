@@ -1,8 +1,14 @@
-import { StyleSheet, Dimensions, Pressable, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Dimensions,
+  Pressable,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   createTable,
   getItems,
@@ -21,6 +27,15 @@ type Item = {
 
 export default function CodesScreen() {
   const [items, setItems] = useState<Item[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   useEffect(() => {
     const db = openDatabase();
     createTable();
@@ -36,7 +51,7 @@ export default function CodesScreen() {
     // db.transaction((tx) => {
     //   tx.executeSql("DELETE FROM items");
     // });
-  }, []);
+  }, [refreshing]);
 
   const qrCodes = (item: Item) => (
     <View key={item.id} className="flex flex-row justify-between p-6 m-1">
@@ -63,7 +78,12 @@ export default function CodesScreen() {
     </View>
   );
   return (
-    <ScrollView className="m-4 bg-[#F2F2F2]">
+    <ScrollView
+      className="m-4 bg-[#F2F2F2]"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {items.map((item) => {
         return (
           <Pressable

@@ -34,7 +34,13 @@ export default function QRModalScreen() {
           style: "cancel",
         },
 
-        { text: "OK", onPress: () => removeItem(item?.id as number) },
+        {
+          text: "OK",
+          onPress: () => {
+            removeItem(item?.id as number);
+            router.back();
+          },
+        },
       ],
       { cancelable: false }
     );

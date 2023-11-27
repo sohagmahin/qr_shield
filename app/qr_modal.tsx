@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
 import { deleteItem, getItem, getItems } from "../services/db";
 import { useEffect, useState } from "react";
+import { useBarCodeStore } from "../stores/useBarCodeStore";
 
 type Item = {
   id: number;
@@ -16,11 +17,16 @@ type Item = {
 
 export default function QRModalScreen() {
   const [item, setItem] = useState<Item>();
+  // const [item, setItem] = useState();
   const local = useLocalSearchParams();
   const { id } = local;
+  const codes = useBarCodeStore((state) => state.barCode);
+  const removeBarCode = useBarCodeStore((state) => state.removeBarCode);
 
   const removeItem = (id: number) => {
-    deleteItem(id);
+    // deleteItem(id);
+    console.log(id);
+    removeBarCode(id);
   };
 
   const showDeleteAlret = () => {
@@ -49,10 +55,18 @@ export default function QRModalScreen() {
   useEffect(() => {
     if (!id) return;
     // getItem(parseInt(id.toString()));
-    getItem(parseInt(id.toString())).then((item: any) => {
-      console.log("itemss ========>>>>");
-      console.log(item);
-      setItem(item);
+    // getItem(parseInt(id.toString())).then((item: any) => {
+    //   console.log("itemss ========>>>>");
+    //   console.log(item);
+    //   setItem(item);
+    // });
+
+    codes.forEach((code: any) => {
+      if (code.id === id) {
+        console.log("inside qr view");
+        console.log(code);
+        setItem(code);
+      }
     });
   }, [id]);
   return (
@@ -70,7 +84,7 @@ export default function QRModalScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/modal",
-                  params: { data: item?.data },
+                  params: { id: item?.id },
                 })
               }
               className="text-lg font-normal"

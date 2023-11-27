@@ -6,12 +6,15 @@ import {
   TextInput,
   Button,
 } from "react-native";
+import uuid from "react-native-uuid";
 
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { insertItem } from "../services/db";
+import { useBarCodeStore } from "../stores/useBarCodeStore";
+import { useEffect, useState } from "react";
 
 type Inputs = {
   name: string;
@@ -22,7 +25,27 @@ type Inputs = {
 
 export default function ModalScreen() {
   const local = useLocalSearchParams();
-  const { data, type } = local;
+  const { id, data, type } = local;
+  const [editItem, setEditItem] = useState<any>();
+  const codes = useBarCodeStore((state) => state.barCode);
+
+  const setBarCode = useBarCodeStore((state) => state.setBarCode);
+  const editBarCode = useBarCodeStore((state) => state.editBarCode);
+
+  // edit bar code
+  useEffect(() => {
+    if (!id) return;
+    codes.forEach((code: any) => {
+      if (code.id === id) {
+        console.log("inside edit view");
+        console.log(code);
+        setEditItem(code);
+      }
+    });
+    () => {
+      setEditItem(undefined);
+    };
+  }, [id]);
 
   const {
     control,
@@ -38,7 +61,9 @@ export default function ModalScreen() {
   });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     console.log(data);
-    insertItem(data.name, data.description, "qr", data.code_info);
+    // insertItem(data.name, data.description, "qr", data.code_info);
+
+    setBarCode({ ...data, type: "qr", id: uuid.v4(), data: data.code_info });
 
     // router.back();
     alert("Item added successfully");

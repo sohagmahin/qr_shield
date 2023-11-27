@@ -41,7 +41,7 @@ const ScanScreen = () => {
         />
       )}
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <Button title={"Tap to Scan"} onPress={() => setScanned(false)} />
       )}
     </View>
   );

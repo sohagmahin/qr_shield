@@ -17,6 +17,9 @@ import {
 } from "../../services/db";
 import { Link, router } from "expo-router";
 
+import { useBarCodeStore } from "../../stores/useBarCodeStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 type Item = {
   id: number;
   name: string;
@@ -29,6 +32,10 @@ export default function CodesScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  const codes = useBarCodeStore((state) => state.barCode);
+  console.log("zustand codes");
+  console.log(codes);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -36,22 +43,27 @@ export default function CodesScreen() {
     }, 2000);
   }, []);
 
-  useEffect(() => {
-    const db = openDatabase();
-    createTable();
+  const clearStorage = async () => {
+    await AsyncStorage.clear();
+  };
 
-    // insertItem("sohag", "test description", "qr", "http://awesome.link.qr");
+  // useEffect(() => {
+  //   const db = openDatabase();
+  //   createTable();
 
-    getItems().then((items: any) => {
-      console.log(items);
-      setItems(items);
-    });
+  //   // insertItem("sohag", "test description", "qr", "http://awesome.link.qr");
 
-    // delete all items
-    // db.transaction((tx) => {
-    //   tx.executeSql("DELETE FROM items");
-    // });
-  }, [refreshing]);
+  //   getItems().then((items: any) => {
+  //     // console.log(items);
+  //     setItems(items);
+  //   });
+
+  //   clearStorage();
+  //   // delete all items
+  //   // db.transaction((tx) => {
+  //   //   tx.executeSql("DELETE FROM items");
+  //   // });
+  // }, [refreshing]);
 
   const qrCodes = (item: Item) => (
     <View key={item.id} className="flex flex-row justify-between p-6 m-1">
@@ -84,22 +96,23 @@ export default function CodesScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {items.map((item) => {
-        return (
-          <Pressable
-            key={item.id}
-            onPress={() => {
-              router.push({
-                pathname: "/qr_modal",
-                params: { id: item.id },
-              });
-            }}
-          >
-            {qrCodes(item)}
-          </Pressable>
-        );
-      })}
-      {items.length === 0 && (
+      {codes &&
+        codes.map((item: any) => {
+          return (
+            <Pressable
+              key={item.id}
+              onPress={() => {
+                router.push({
+                  pathname: "/qr_modal",
+                  params: { id: item.id },
+                });
+              }}
+            >
+              {qrCodes(item)}
+            </Pressable>
+          );
+        })}
+      {codes && codes.length === 0 && (
         <View className="flex items-center justify-center bg-transparent">
           <Text className="text-3xl font-bold">No items found</Text>
         </View>

@@ -29,7 +29,7 @@ export default function TabLayout() {
           title: "Codes",
           tabBarIcon: ({ color }) => <TabBarIcon name="qrcode" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/about_modal" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome

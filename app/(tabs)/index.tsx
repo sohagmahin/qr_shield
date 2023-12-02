@@ -9,12 +9,7 @@ import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { useEffect, useState, useCallback } from "react";
-import {
-  createTable,
-  getItems,
-  insertItem,
-  openDatabase,
-} from "../../services/db";
+
 import { Link, router } from "expo-router";
 
 import { useBarCodeStore } from "../../stores/useBarCodeStore";
@@ -46,24 +41,6 @@ export default function CodesScreen() {
   const clearStorage = async () => {
     await AsyncStorage.clear();
   };
-
-  // useEffect(() => {
-  //   const db = openDatabase();
-  //   createTable();
-
-  //   // insertItem("sohag", "test description", "qr", "http://awesome.link.qr");
-
-  //   getItems().then((items: any) => {
-  //     // console.log(items);
-  //     setItems(items);
-  //   });
-
-  //   clearStorage();
-  //   // delete all items
-  //   // db.transaction((tx) => {
-  //   //   tx.executeSql("DELETE FROM items");
-  //   // });
-  // }, [refreshing]);
 
   const qrCodes = (item: Item) => (
     <View key={item.id} className="flex flex-row justify-between p-6 m-1">

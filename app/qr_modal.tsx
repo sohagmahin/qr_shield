@@ -3,7 +3,6 @@ import { Platform, TextInput, Button, Alert } from "react-native";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
-import { deleteItem, getItem, getItems } from "../services/db";
 import { useEffect, useState } from "react";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 

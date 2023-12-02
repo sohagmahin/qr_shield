@@ -58,6 +58,14 @@ function RootLayoutNav() {
           name="qr_modal"
           options={{ presentation: "modal", headerShown: false }}
         />
+        <Stack.Screen
+          name="about_modal"
+          options={{
+            presentation: "modal",
+            headerShown: true,
+            title: "Supported Barcode",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

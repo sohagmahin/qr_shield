@@ -1,18 +1,9 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  Button,
-} from "react-native";
+import { Platform, TextInput, Button } from "react-native";
 import uuid from "react-native-uuid";
-
-import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { insertItem } from "../services/db";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { useEffect, useState } from "react";
 
@@ -25,12 +16,32 @@ type Inputs = {
 
 export default function ModalScreen() {
   const local = useLocalSearchParams();
-  const { id, data, type } = local;
+  const { id, data } = local;
   const [editItem, setEditItem] = useState<any>();
   const codes = useBarCodeStore((state) => state.barCode);
 
   const setBarCode = useBarCodeStore((state) => state.setBarCode);
   const editBarCode = useBarCodeStore((state) => state.editBarCode);
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<Inputs>({
+    defaultValues: {
+      name: "",
+      description: "",
+      date: new Date(),
+      code_info: "",
+    },
+  });
+
+  // receive data from scanner
+  useEffect(() => {
+    if (!data) return;
+    setValue("code_info", data.toString());
+  }, [data]);
 
   // edit bar code
   useEffect(() => {
@@ -47,26 +58,37 @@ export default function ModalScreen() {
     };
   }, [id]);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      name: "",
-      description: "",
-      date: new Date(),
-      code_info: data.toString(),
-    },
-  });
+  useEffect(() => {
+    if (!editItem) return;
+    setValue("name", editItem.name);
+    setValue("description", editItem.description);
+    setValue("date", editItem.date);
+    setValue("code_info", editItem.code_info);
+  }, [editItem]);
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     console.log(data);
     // insertItem(data.name, data.description, "qr", data.code_info);
+    if (id) {
+      editBarCode({
+        id: id,
+        name: data.name,
+        description: data.description,
+        type: "qr",
+        data: data.code_info,
+      });
+    } else {
+      setBarCode({ ...data, type: "qr", id: uuid.v4(), data: data.code_info });
+    }
 
-    setBarCode({ ...data, type: "qr", id: uuid.v4(), data: data.code_info });
+    alert(`Item ${id ? "edited" : "added"} successfully!`);
 
-    // router.back();
-    alert("Item added successfully");
+    if (id) {
+      router.back();
+    } else {
+      // push with replacement
+      router.push({ pathname: "/(tabs)" });
+    }
   };
 
   return (
@@ -130,7 +152,7 @@ export default function ModalScreen() {
               onBlur={onBlur}
               editable={false}
               onChangeText={onChange}
-              defaultValue={data.toString()}
+              // defaultValue={data.toString()}
               value={value.toString()}
             />
           )}

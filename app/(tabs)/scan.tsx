@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Button } from "react-native";
+import { Text, View, StyleSheet, Button, Pressable } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
 
@@ -41,8 +41,14 @@ const ScanScreen = () => {
         />
       )}
       {scanned && (
-        <Button title={"Tap to Scan"} onPress={() => setScanned(false)} />
+        <Pressable
+          className="p-3 bg-blue-400 rounded-md"
+          onPress={() => setScanned(false)}
+        >
+          <Text className="text-white">Tap to Scan Again</Text>
+        </Pressable>
       )}
+      {/* stop scanning */}
     </View>
   );
 };

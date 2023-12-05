@@ -1,16 +1,20 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, TextInput, Button } from "react-native";
+import { Platform, TextInput, Button, Pressable } from "react-native";
 import uuid from "react-native-uuid";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { useEffect, useState } from "react";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import useDatePickerStore from "../stores/useDatePickerStore";
+import BottomSheets from "../components/bottom_sheets";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 type Inputs = {
   name: string;
   description: string;
-  date: Date;
+  date: String;
   code_info: string;
 };
 
@@ -23,6 +27,18 @@ export default function ModalScreen() {
   const setBarCode = useBarCodeStore((state) => state.setBarCode);
   const editBarCode = useBarCodeStore((state) => state.editBarCode);
 
+  const [date, setDate] = useState(new Date());
+
+  const show = useDatePickerStore((state) => state.show);
+  const toggle = useDatePickerStore((state) => state.toggle);
+
+  const addZero = (num: number) => {
+    if (num < 10) {
+      return `0${num}`;
+    }
+    return num;
+  };
+
   const {
     control,
     handleSubmit,
@@ -32,7 +48,9 @@ export default function ModalScreen() {
     defaultValues: {
       name: "",
       description: "",
-      date: new Date(),
+      date: `${date.getFullYear()}-${addZero(date.getMonth())}-${addZero(
+        date.getDate()
+      )}`,
       code_info: "",
     },
   });
@@ -63,10 +81,20 @@ export default function ModalScreen() {
     setValue("name", editItem.name);
     setValue("description", editItem.description);
     setValue("date", editItem.date);
-    setValue("code_info", editItem.code_info);
+    setValue("code_info", editItem.data);
   }, [editItem]);
 
+  useEffect(() => {
+    setValue(
+      "date",
+      `${date.getFullYear()}-${addZero(date.getMonth())}-${addZero(
+        date.getDate()
+      )}`
+    );
+  }, [date]);
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log("submite data");
     console.log(data);
     // insertItem(data.name, data.description, "qr", data.code_info);
     if (id) {
@@ -75,6 +103,7 @@ export default function ModalScreen() {
         name: data.name,
         description: data.description,
         type: "qr",
+        date: data.date,
         data: data.code_info,
       });
     } else {
@@ -91,8 +120,22 @@ export default function ModalScreen() {
     }
   };
 
+  const openDatePicker = () => {
+    if (Platform.OS === "ios") {
+      toggle();
+    } else if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        value: new Date(date),
+        mode: "date",
+        onChange: (date) => {
+          setDate(new Date(date.nativeEvent?.timestamp || ""));
+        },
+      });
+    }
+  };
+
   return (
-    <View className="flex items-center">
+    <View className="flex items-center flex-1">
       <Text className="text-3xl font-bold">Add new item</Text>
       <View className="w-11/12">
         <Controller
@@ -132,13 +175,20 @@ export default function ModalScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
-              placeholder="Date"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value.toString()}
-            />
+            <View className="flex flex-row items-center gap-x-2">
+              <TextInput
+                className="flex-1 h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
+                placeholder="Date"
+                onBlur={onBlur}
+                // onChangeText={onChange}
+                editable={false}
+                value={value.toString()}
+              />
+              {/* Date picker icon button */}
+              <Pressable onPress={openDatePicker} className="mt-5">
+                <Ionicons name="calendar-outline" size={32} color="green" />
+              </Pressable>
+            </View>
           )}
           name="date"
         />
@@ -159,7 +209,12 @@ export default function ModalScreen() {
           name="code_info"
         />
       </View>
+      {/* IOS date picker */}
+      {show && Platform.OS === "ios" && (
+        <BottomSheets date={new Date(date)} setDate={setDate} />
+      )}
       <Button title="Submit" onPress={handleSubmit(onSubmit)} />
+
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );

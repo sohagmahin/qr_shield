@@ -42,6 +42,8 @@ export default function CodesScreen() {
     await AsyncStorage.clear();
   };
 
+  // clearStorage();
+
   const qrCodes = (item: Item) => (
     <View key={item.id} className="flex flex-row justify-between p-6 m-1">
       <View>

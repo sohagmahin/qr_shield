@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
 import { useEffect, useState } from "react";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Item = {
   id: number;
@@ -69,37 +70,39 @@ export default function QRModalScreen() {
     });
   }, [id]);
   return (
-    <View className="flex items-center h-full">
-      {item ? (
-        <View className="flex flex-col">
-          <View className="flex flex-row justify-between w-screen px-5 py-2">
-            <Text
-              onPress={() => showDeleteAlret()}
-              className="text-lg font-normal"
-            >
-              Delete
-            </Text>
-            <Text
-              onPress={() =>
-                router.push({
-                  pathname: "/modal",
-                  params: { id: item?.id },
-                })
-              }
-              className="text-lg font-normal"
-            >
-              Edit
-            </Text>
+    <SafeAreaView>
+      <View className="flex items-center h-full">
+        {item ? (
+          <View className="flex flex-col">
+            <View className="flex flex-row justify-between w-screen px-5 py-2">
+              <Text
+                onPress={() => showDeleteAlret()}
+                className="text-lg font-normal"
+              >
+                Delete
+              </Text>
+              <Text
+                onPress={() =>
+                  router.push({
+                    pathname: "/modal",
+                    params: { id: item?.id },
+                  })
+                }
+                className="text-lg font-normal"
+              >
+                Edit
+              </Text>
+            </View>
+            <View className="flex items-center justify-center flex-grow">
+              <QRCode value={item.data.toString()} size={300} />
+              <Text className="mt-5 text-3xl font-bold">{item.name}</Text>
+            </View>
           </View>
-          <View className="flex items-center justify-center flex-grow">
-            <QRCode value={item.data.toString()} size={300} />
-            <Text className="mt-5 text-3xl font-bold">{item.name}</Text>
-          </View>
-        </View>
-      ) : (
-        <Text>loading</Text>
-      )}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-    </View>
+        ) : (
+          <Text>loading</Text>
+        )}
+        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+      </View>
+    </SafeAreaView>
   );
 }

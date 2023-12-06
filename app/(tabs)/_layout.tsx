@@ -48,14 +48,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               className={`flex flex-row items-center px-3 py-2 rounded-full gap-x-2 ${
-                focused ? "bg-blue-50 dark:bg-black" : "dark:bg-transparent"
+                focused ? "bg-red-50 dark:bg-black" : "dark:bg-transparent"
               } `}
             >
               <TabBarIcon name="qrcode" color={color} />
               <Text
                 className={`text-xl ${
                   focused
-                    ? "font-semibold text-blue-400"
+                    ? "font-semibold text-red-400 dark:text-white"
                     : "font-normal opacity-50"
                 }`}
               >
@@ -87,14 +87,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               className={`flex flex-row items-center px-3 py-2 rounded-full gap-x-2 ${
-                focused ? "bg-blue-50 dark:bg-black" : "dark:bg-transparent"
+                focused ? "bg-red-50 dark:bg-black" : "dark:bg-transparent"
               } `}
             >
               <TabBarIcon name="camera-retro" color={color} />
               <Text
                 className={`text-xl ${
                   focused
-                    ? "font-semibold text-blue-400"
+                    ? "font-semibold text-red-400 dark:text-white"
                     : "font-normal opacity-50"
                 }`}
               >

@@ -45,12 +45,17 @@ export default function CodesScreen() {
   // clearStorage();
 
   const qrCodes = (item: Item) => (
-    <View key={item.id} className="flex flex-row justify-between p-6 m-1">
-      <View>
-        <Text className="text-red-400">{item.name}</Text>
+    <View
+      key={item.id}
+      className="flex flex-row justify-between items-center p-6 m-1 dark:bg-[#121212] rounded-xl"
+    >
+      <View className="flex-1 bg-transparent">
+        <Text className="text-lg font-semibold text-red-400">{item.name}</Text>
         <Text>{item.description}</Text>
       </View>
-      <QRCode value={item.data} size={50} />
+      <View className="bg-transparent">
+        <QRCode value={item.data} size={50} />
+      </View>
     </View>
   );
 
@@ -70,7 +75,7 @@ export default function CodesScreen() {
   );
   return (
     <ScrollView
-      className="m-4 bg-[#F2F2F2]"
+      className="m-4"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }

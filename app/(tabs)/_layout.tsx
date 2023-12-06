@@ -3,6 +3,7 @@ import { Link, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
 
 import Colors from "../../constants/Colors";
+import { Text, View } from "../../components/Themed";
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -11,7 +12,7 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -21,13 +22,47 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarStyle: {
+          position: "absolute",
+          bottom: 50,
+          borderRadius: 30,
+          height: 60,
+          marginHorizontal: "16%",
+          shadowOpacity: 0.1,
+          shadowRadius: 10,
+        },
+        tabBarItemStyle: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "red",
+          height: 60,
+        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Codes",
-          tabBarIcon: ({ color }) => <TabBarIcon name="qrcode" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View
+              className={`flex flex-row items-center px-3 py-2 rounded-full gap-x-2 ${
+                focused ? "bg-blue-50 dark:bg-black" : "dark:bg-transparent"
+              } `}
+            >
+              <TabBarIcon name="qrcode" color={color} />
+              <Text
+                className={`text-xl ${
+                  focused
+                    ? "font-semibold text-blue-400"
+                    : "font-normal opacity-50"
+                }`}
+              >
+                Home
+              </Text>
+            </View>
+          ),
           headerRight: () => (
             <Link href="/about_modal" asChild>
               <Pressable>
@@ -48,8 +83,24 @@ export default function TabLayout() {
         name="scan"
         options={{
           title: "Scan",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="camera-retro" color={color} />
+
+          tabBarIcon: ({ color, focused }) => (
+            <View
+              className={`flex flex-row items-center px-3 py-2 rounded-full gap-x-2 ${
+                focused ? "bg-blue-50 dark:bg-black" : "dark:bg-transparent"
+              } `}
+            >
+              <TabBarIcon name="camera-retro" color={color} />
+              <Text
+                className={`text-xl ${
+                  focused
+                    ? "font-semibold text-blue-400"
+                    : "font-normal opacity-50"
+                }`}
+              >
+                Scan
+              </Text>
+            </View>
           ),
         }}
       />

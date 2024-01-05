@@ -1,6 +1,7 @@
-import { View, Text, Platform } from "react-native";
+import { Platform } from "react-native";
+import { Text, View } from "../components/Themed";
 import React from "react";
-import { ScrollView } from "react-native-gesture-handler";
+import packageJson from "../package.json";
 
 const AboutModal = () => {
   let androidList = [
@@ -41,32 +42,45 @@ const AboutModal = () => {
   ];
 
   return (
-    <View className="flex items-center justify-center text-center">
-      <ScrollView>
-        {/* show list item as grid view */}
-        {Platform.OS === "android" && (
-          <>
-            <Text className="text-xl font-bold">Android</Text>
-            {androidList.map((item: any) => {
-              return <Text key={item}>{item}</Text>;
-            })}
-          </>
-        )}
+    <View className="flex items-center h-full m-4 bg-transparent gap-y-2">
+      <Text className="pt-1 text-lg font-semibold"> Supported types: </Text>
 
-        {Platform.OS === "ios" && (
-          <>
-            <Text className="text-xl font-bold">iOS</Text>
-            {iosList.map((item: any) => {
-              return <Text key={item}>{item}</Text>;
-            })}
-          </>
-        )}
+      {Platform.OS === "android" && (
+        <View className="flex flex-row flex-wrap justify-center gap-1 bg-transparent">
+          {androidList.map((item: any) => {
+            return (
+              <Text
+                key={item}
+                className="p-1 bg-white opacity-75 dark:bg-[#121212]"
+              >
+                {item}
+              </Text>
+            );
+          })}
+        </View>
+      )}
 
-        <Text className="text-2xl font-bold">About</Text>
-        <Text className="text-xl font-bold">Version 1.0.0</Text>
-        <Text className="text-xl font-bold">Author: Prashant</Text>
-        <Text className="text-xl font-bold">Contact: </Text>
-      </ScrollView>
+      {Platform.OS === "ios" && (
+        <View className="flex flex-row flex-wrap justify-center gap-1 bg-transparent">
+          {iosList.map((item: any) => {
+            return (
+              <Text
+                key={item}
+                className="p-1 bg-white opacity-75 dark:bg-[#121212]"
+              >
+                {item}
+              </Text>
+            );
+          })}
+        </View>
+      )}
+
+      <View className="flex items-center justify-center bg-transparent">
+        <Text className="text-xl font-bold ">{packageJson.name || ""}</Text>
+        <Text className="text-xs opacity-75">
+          Version :{packageJson.version || ""}
+        </Text>
+      </View>
     </View>
   );
 };

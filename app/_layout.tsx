@@ -65,7 +65,8 @@ function RootLayoutNav() {
             options={{
               presentation: "modal",
               headerShown: true,
-              title: "Supported Barcode",
+              title: "About",
+              headerTitleAlign: "center",
             }}
           />
         </Stack>

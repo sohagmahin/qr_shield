@@ -1,5 +1,6 @@
 # qr_shield
 
 - [ ] Input box design
-- [ ] Bar code Card
+- [x] Bar code Card
 - [ ] Scan code from Gallery
+- [ ] Fix date picker issue

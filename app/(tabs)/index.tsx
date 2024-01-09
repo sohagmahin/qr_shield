@@ -59,20 +59,27 @@ export default function CodesScreen() {
     </View>
   );
 
-  const barCodes = (
-    <View className="flex flex-col justify-between p-6 m-1">
-      <View>
-        <Text className="text-red-400">Name</Text>
-        <Text>Description</Text>
+  const barCodes = (item: Item) => (
+    <View
+      key={item.id}
+      className="flex flex-row justify-between items-center p-6 m-1 dark:bg-[#121212] rounded-xl"
+    >
+      <View className="flex-1 bg-transparent">
+        <Text className="text-lg font-semibold text-red-400">{item.name}</Text>
+        <Text>{item.description}</Text>
       </View>
-      <Barcode
-        format="EAN13"
-        value="0123456789012"
-        text="0123456789012"
-        maxWidth={Dimensions.get("window").width / 2}
-      />
+      <View className="bg-transparent">
+        <Barcode
+          format="CODE128"
+          value={item.data}
+          width={0.6}
+          height={50}
+          maxWidth={Dimensions.get("window").width / 2}
+        />
+      </View>
     </View>
   );
+
   return (
     <ScrollView
       className="m-4"
@@ -82,6 +89,7 @@ export default function CodesScreen() {
     >
       {codes &&
         codes.map((item: any) => {
+          console.log(item);
           return (
             <Pressable
               key={item.id}
@@ -92,7 +100,7 @@ export default function CodesScreen() {
                 });
               }}
             >
-              {qrCodes(item)}
+              {item.type === "QRCode" ? qrCodes(item) : barCodes(item)}
             </Pressable>
           );
         })}

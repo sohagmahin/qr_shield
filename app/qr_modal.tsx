@@ -1,11 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, TextInput, Button, Alert } from "react-native";
+import { Platform, TextInput, Button, Alert, Dimensions } from "react-native";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
 import { useEffect, useState } from "react";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Barcode from "@kichiyaki/react-native-barcode-generator";
 
 type Item = {
   id: number;
@@ -94,7 +95,16 @@ export default function QRModalScreen() {
               </Text>
             </View>
             <View className="flex items-center justify-center flex-grow">
-              <QRCode value={item.data.toString()} size={300} />
+              {item.type === "QRCode" ? (
+                <QRCode value={item.data.toString()} size={300} />
+              ) : (
+                <Barcode
+                  format="CODE128"
+                  value={item.data}
+                  text={item.data}
+                  maxWidth={Dimensions.get("window").width / 1.2}
+                />
+              )}
               <Text className="mt-5 text-3xl font-bold">{item.name}</Text>
             </View>
           </View>

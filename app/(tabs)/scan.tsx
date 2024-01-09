@@ -19,10 +19,13 @@ const ScanScreen = () => {
 
   const handleBarCodeScanned = ({ type, data }: any) => {
     setScanned(true);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     console.log(data);
-    console.log(type);
-    router.push({ pathname: "/modal", params: { data: data, type: type } });
+    console.log(type.split(".")[2]);
+    router.push({
+      pathname: "/modal",
+      params: { data: data, type: type.split(".")[2] },
+    });
   };
 
   if (hasPermission === null) {

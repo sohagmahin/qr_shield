@@ -1,8 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, TextInput, Button, Pressable } from "react-native";
+import {
+  Platform,
+  // TextInput,
+  Button,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import uuid from "react-native-uuid";
-import { Text, View } from "../components/Themed";
-import { router, useLocalSearchParams } from "expo-router";
+import { Text, View, TextInput } from "../components/Themed";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { useEffect, useState } from "react";
@@ -10,17 +16,21 @@ import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import useDatePickerStore from "../stores/useDatePickerStore";
 import BottomSheets from "../components/bottom_sheets";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Barcode from "@kichiyaki/react-native-barcode-generator";
+import QRCode from "react-native-qrcode-svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Inputs = {
   name: string;
   description: string;
   date: String;
   code_info: string;
+  type: string;
 };
 
 export default function ModalScreen() {
   const local = useLocalSearchParams();
-  const { id, data } = local;
+  const { id, data, type } = local;
   const [editItem, setEditItem] = useState<any>();
   const codes = useBarCodeStore((state) => state.barCode);
 
@@ -52,14 +62,15 @@ export default function ModalScreen() {
         date.getDate()
       )}`,
       code_info: "",
+      type: "",
     },
   });
 
   // receive data from scanner
   useEffect(() => {
-    if (!data) return;
-    setValue("code_info", data.toString());
-  }, [data]);
+    if (data) setValue("code_info", data.toString());
+    if (type) setValue("type", type.toString());
+  }, [data, type]);
 
   // edit bar code
   useEffect(() => {
@@ -80,6 +91,7 @@ export default function ModalScreen() {
     if (!editItem) return;
     setValue("name", editItem.name);
     setValue("description", editItem.description);
+    setValue("type", editItem.type);
     setValue("date", editItem.date);
     setValue("code_info", editItem.data);
   }, [editItem]);
@@ -102,12 +114,17 @@ export default function ModalScreen() {
         id: id,
         name: data.name,
         description: data.description,
-        type: "qr",
+        type: data.type,
         date: data.date,
         data: data.code_info,
       });
     } else {
-      setBarCode({ ...data, type: "qr", id: uuid.v4(), data: data.code_info });
+      setBarCode({
+        ...data,
+        type: data.type,
+        id: uuid.v4(),
+        data: data.code_info,
+      });
     }
 
     alert(`Item ${id ? "edited" : "added"} successfully!`);
@@ -134,10 +151,34 @@ export default function ModalScreen() {
     }
   };
 
+  const showPreviewCode = () => {
+    let codeType = editItem ? editItem.type : type;
+    let codeData = editItem ? editItem.data : data;
+
+    return (
+      <View className="self-center">
+        {codeType === "QRCode" ? (
+          <QRCode value={codeData} size={200} />
+        ) : (
+          <Barcode
+            format="CODE128"
+            value={codeData || "12345"}
+            text={codeData || ""}
+            maxWidth={Dimensions.get("window").width / 1.2}
+          />
+        )}
+      </View>
+    );
+  };
+
   return (
-    <View className="flex items-center flex-1">
-      <Text className="text-3xl font-bold">Add new item</Text>
-      <View className="w-11/12">
+    <SafeAreaView className="flex items-center flex-1 bg-white dark:bg-[#121212]">
+      {/* <View className="flex items-center flex-1"> */}
+      <View className="w-11/12 dark:bg-[#121212]">
+        {showPreviewCode()}
+        <Text className="px-10 text-sm text-center opacity-30">
+          The barcode may looks different but holds the same data.
+        </Text>
         <Controller
           control={control}
           rules={{
@@ -192,30 +233,22 @@ export default function ModalScreen() {
           )}
           name="date"
         />
-
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
-              placeholder="Code info"
-              onBlur={onBlur}
-              editable={false}
-              onChangeText={onChange}
-              // defaultValue={data.toString()}
-              value={value.toString()}
-            />
-          )}
-          name="code_info"
-        />
       </View>
+      <Pressable
+        className="flex items-center justify-center w-11/12 h-12 mt-5 bg-red-400 rounded-md"
+        onPress={handleSubmit(onSubmit)}
+      >
+        <Text className="text-lg font-bold text-white">
+          {id ? "Update" : "Save"}
+        </Text>
+      </Pressable>
       {/* IOS date picker */}
       {show && Platform.OS === "ios" && (
         <BottomSheets date={new Date(date)} setDate={setDate} />
       )}
-      <Button title="Submit" onPress={handleSubmit(onSubmit)} />
 
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-    </View>
+      {/* </View> */}
+    </SafeAreaView>
   );
 }

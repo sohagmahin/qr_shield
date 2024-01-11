@@ -100,7 +100,7 @@ export default function ModalScreen() {
   useEffect(() => {
     setValue(
       "date",
-      `${date.getFullYear()}-${addZero(date.getMonth())}-${addZero(
+      `${date.getFullYear()}-${addZero(date.getMonth() + 1)}-${addZero(
         date.getDate()
       )}`
     );
@@ -143,7 +143,7 @@ export default function ModalScreen() {
       toggle();
     } else if (Platform.OS === "android") {
       DateTimePickerAndroid.open({
-        value: new Date(date),
+        value: new Date(),
         mode: "date",
         onChange: (date) => {
           setDate(new Date(date.nativeEvent?.timestamp || ""));

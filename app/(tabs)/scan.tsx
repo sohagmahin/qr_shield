@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from "expo-image-picker";
 
 const ScanScreen = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -52,6 +52,32 @@ const ScanScreen = () => {
     return <Text>No access to camera</Text>;
   }
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets[0].uri) {
+      try {
+        const scannedResults = await BarCodeScanner.scanFromURLAsync(
+          result.assets[0].uri
+        );
+
+        const data = scannedResults[0].data;
+        const codeType = scannedResults[0].type;
+        console.log(codeType);
+        handleBarCodeScanned({ type: codeType, data: data });
+      } catch (error) {
+        // if there this no QR code
+        alert("No QR Code Found");
+      }
+    }
+  };
+
   return (
     // <SafeAreaView>
     <View className="flex items-center justify-end flex-1">
@@ -75,7 +101,7 @@ const ScanScreen = () => {
 
         <Pressable
           className="self-center p-4 bg-red-400 rounded-full"
-          onPress={() => setScanned((prev) => !prev)}
+          onPress={pickImage}
         >
           <Text className="text-xl font-semibold text-white ">
             Get from gallery

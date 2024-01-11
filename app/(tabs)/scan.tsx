@@ -10,6 +10,7 @@ import {
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import * as Haptics from "../../constants/Haptics";
 
 const ScanScreen = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -30,6 +31,7 @@ const ScanScreen = () => {
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     console.log(data);
     console.log(type);
+    Haptics.hapticSuccess();
 
     // In android qr code is 256
     // In ios qr code is org.iso.QRCode
@@ -69,10 +71,9 @@ const ScanScreen = () => {
 
         const data = scannedResults[0].data;
         const codeType = scannedResults[0].type;
-        console.log(codeType);
         handleBarCodeScanned({ type: codeType, data: data });
       } catch (error) {
-        // if there this no QR code
+        Haptics.hapticError();
         alert("No QR Code Found");
       }
     }

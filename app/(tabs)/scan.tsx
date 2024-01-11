@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Button, Pressable } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  Pressable,
+  Platform,
+} from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
 
@@ -21,10 +28,19 @@ const ScanScreen = () => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     console.log(data);
-    console.log(type.split(".")[2]);
+    console.log(type);
+
+    // In android qr code is 256
+    // In ios qr code is org.iso.QRCode
+    const barCodeType =
+      Platform.OS === "ios"
+        ? type?.split(".")[2]
+        : type === 256
+        ? "QRCode"
+        : "barcode";
     router.push({
       pathname: "/modal",
-      params: { data: data, type: type.split(".")[2] },
+      params: { data: data, type: barCodeType },
     });
   };
 

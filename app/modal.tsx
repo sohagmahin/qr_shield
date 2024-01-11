@@ -5,6 +5,7 @@ import {
   Button,
   Pressable,
   Dimensions,
+  useColorScheme,
 } from "react-native";
 import uuid from "react-native-uuid";
 import { Text, View, TextInput } from "../components/Themed";
@@ -171,8 +172,26 @@ export default function ModalScreen() {
     );
   };
 
+  const AndroidAppBar = (
+    <View className="flex flex-row items-center justify-between w-screen h-16 p-3 shadow">
+      <Ionicons
+        name="arrow-back"
+        size={24}
+        color={useColorScheme() === "dark" ? "white" : "black"}
+        onPress={() => {
+          router.back();
+        }}
+      />
+      <Text className="self-center text-lg font-bold">
+        {id ? "Edit" : "Add New Code"}
+      </Text>
+      <Text> </Text>
+    </View>
+  );
+
   return (
     <SafeAreaView className="flex items-center flex-1 bg-white dark:bg-[#121212]">
+      {Platform.OS === "android" && AndroidAppBar}
       {/* <View className="flex items-center flex-1"> */}
       <View className="w-11/12 dark:bg-[#121212]">
         {showPreviewCode()}

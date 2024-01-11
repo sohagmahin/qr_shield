@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ScanScreen = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(true);
+  const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -52,23 +53,38 @@ const ScanScreen = () => {
   }
 
   return (
-    <View className="flex items-center justify-center flex-1">
+    // <SafeAreaView>
+    <View className="flex items-center justify-end flex-1">
       {!scanned && (
         <BarCodeScanner
+          className=""
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}
         />
       )}
-      {scanned && (
+
+      <View className="absolute gap-2 bottom-32 ">
         <Pressable
-          className="p-3 bg-blue-400 rounded-md"
-          onPress={() => setScanned(false)}
+          className="self-center p-4 bg-red-400 rounded-full"
+          onPress={() => setScanned((prev) => !prev)}
         >
-          <Text className="text-white">Tap to Scan Again</Text>
+          <Text className="text-xl font-semibold text-white ">
+            {scanned ? "Tap to open camera" : "Stop Camera Scan"}
+          </Text>
         </Pressable>
-      )}
+
+        <Pressable
+          className="self-center p-4 bg-red-400 rounded-full"
+          onPress={() => setScanned((prev) => !prev)}
+        >
+          <Text className="text-xl font-semibold text-white ">
+            Get from gallery
+          </Text>
+        </Pressable>
+      </View>
       {/* stop scanning */}
     </View>
+    // </SafeAreaView>
   );
 };
 

@@ -195,8 +195,9 @@ export default function ModalScreen() {
       {/* <View className="flex items-center flex-1"> */}
       <View className="w-11/12 dark:bg-[#121212]">
         {showPreviewCode()}
-        <Text className="px-10 text-sm text-center opacity-30">
-          The barcode may looks different but holds the same data.
+        <Text className="px-10 text-sm italic text-center opacity-30">
+          N.B: The barcode may looks different with the actual one. But it holds
+          the same data.
         </Text>
         <Controller
           control={control}

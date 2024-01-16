@@ -1,5 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, Pressable, Dimensions, useColorScheme } from "react-native";
+import {
+  Platform,
+  Pressable,
+  Dimensions,
+  useColorScheme,
+  KeyboardAvoidingView,
+} from "react-native";
 import uuid from "react-native-uuid";
 import { Text, View, TextInput } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,6 +20,7 @@ import Barcode from "@kichiyaki/react-native-barcode-generator";
 import QRCode from "react-native-qrcode-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "../constants/Haptics";
+import { ScrollView } from "react-native-gesture-handler";
 
 type Inputs = {
   name: string;
@@ -184,86 +191,97 @@ export default function ModalScreen() {
     <SafeAreaView className="flex items-center flex-1 bg-white dark:bg-[#121212]">
       {Platform.OS === "android" && AndroidAppBar}
       {/* <View className="flex items-center flex-1"> */}
-      <View className="w-11/12 dark:bg-[#121212]">
-        {showPreviewCode()}
-        {!id && (
-          <Text className="px-10 mt-1 text-sm italic text-center opacity-30">
-            N.B: The barcode may looks different with the actual one. But it
-            holds the same data.
-          </Text>
-        )}
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View className="mt-5 bg-transparent">
-              <Text className="opacity-75">Name</Text>
-              <TextInput
-                className="h-12 p-2 border-2 border-gray-300 rounded-md "
-                placeholder="Name"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="name"
-        />
-        {errors.name && (
-          <Text className="py-2 text-red-500">This is required.</Text>
-        )}
-
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View className="mt-5 bg-transparent">
-              <Text className="opacity-75">Description</Text>
-              <TextInput
-                className="h-12 p-2 border-2 border-gray-300 rounded-md "
-                placeholder="Description"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="description"
-        />
-
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View className="mt-5 bg-transparent">
-              <Text className="opacity-75">Expiration Date</Text>
-              <Pressable onPress={openDatePicker}>
-                <View className="flex flex-row items-center bg-transparent gap-x-2">
-                  <TextInput
-                    className="flex-1 h-12 p-2 border-2 border-gray-300 rounded-md "
-                    placeholder="Date"
-                    onBlur={onBlur}
-                    // onChangeText={onChange}
-                    editable={false}
-                    value={value.toString()}
-                  />
-                  {/* Date picker icon button */}
-                  <Ionicons name="ios-calendar-sharp" size={32} color="green" />
-                </View>
-              </Pressable>
-            </View>
-          )}
-          name="date"
-        />
-      </View>
-      <Pressable
-        className="flex items-center justify-center w-11/12 h-12 mt-5 bg-red-400 rounded-md"
-        onPress={handleSubmit(onSubmit)}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex flex-1 w-11/12"
       >
-        <Text className="text-lg font-bold text-white">
-          {id ? "Update" : "Save"}
-        </Text>
-      </Pressable>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className=" dark:bg-[#121212]">
+            {showPreviewCode()}
+            {!id && (
+              <Text className="px-10 mt-1 text-sm italic text-center opacity-30">
+                N.B: The barcode may looks different with the actual one. But it
+                holds the same data.
+              </Text>
+            )}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View className="mt-5 bg-transparent">
+                  <Text className="opacity-75">Name</Text>
+                  <TextInput
+                    className="h-12 p-2 border-2 border-gray-300 rounded-md "
+                    placeholder="Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </View>
+              )}
+              name="name"
+            />
+            {errors.name && (
+              <Text className="py-2 text-red-500">This is required.</Text>
+            )}
+
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View className="mt-5 bg-transparent">
+                  <Text className="opacity-75">Description</Text>
+                  <TextInput
+                    className="h-12 p-2 border-2 border-gray-300 rounded-md "
+                    placeholder="Description"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </View>
+              )}
+              name="description"
+            />
+
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View className="mt-5 bg-transparent">
+                  <Text className="opacity-75">Expiration Date</Text>
+                  <Pressable onPress={openDatePicker}>
+                    <View className="flex flex-row items-center bg-transparent gap-x-2">
+                      <TextInput
+                        className="flex-1 h-12 p-2 border-2 border-gray-300 rounded-md "
+                        placeholder="Date"
+                        onBlur={onBlur}
+                        // onChangeText={onChange}
+                        editable={false}
+                        value={value.toString()}
+                      />
+                      {/* Date picker icon button */}
+                      <Ionicons
+                        name="ios-calendar-sharp"
+                        size={32}
+                        color="green"
+                      />
+                    </View>
+                  </Pressable>
+                </View>
+              )}
+              name="date"
+            />
+          </View>
+          <Pressable
+            className="flex items-center justify-center w-full h-12 mt-5 bg-red-400 rounded-md"
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text className="text-lg font-bold text-white">
+              {id ? "Update" : "Save"}
+            </Text>
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* IOS date picker */}
       {show && Platform.OS === "ios" && (
         <BottomSheets date={new Date(date)} setDate={setDate} />

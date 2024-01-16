@@ -20,6 +20,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import QRCode from "react-native-qrcode-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Haptics from "../constants/Haptics";
 
 type Inputs = {
   name: string;
@@ -139,6 +140,7 @@ export default function ModalScreen() {
   };
 
   const openDatePicker = () => {
+    Haptics.hapticFeedbackLight();
     if (Platform.OS === "ios") {
       toggle();
     } else if (Platform.OS === "android") {
@@ -157,7 +159,7 @@ export default function ModalScreen() {
     let codeData = editItem ? editItem.data : data;
 
     return (
-      <View className="self-center">
+      <View className="self-center p-2 bg-white">
         {codeType === "QRCode" ? (
           <QRCode value={codeData} size={200} />
         ) : (
@@ -195,23 +197,28 @@ export default function ModalScreen() {
       {/* <View className="flex items-center flex-1"> */}
       <View className="w-11/12 dark:bg-[#121212]">
         {showPreviewCode()}
-        <Text className="px-10 text-sm italic text-center opacity-30">
-          N.B: The barcode may looks different with the actual one. But it holds
-          the same data.
-        </Text>
+        {!id && (
+          <Text className="px-10 mt-1 text-sm italic text-center opacity-30">
+            N.B: The barcode may looks different with the actual one. But it
+            holds the same data.
+          </Text>
+        )}
         <Controller
           control={control}
           rules={{
             required: true,
           }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
-              placeholder="Name"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View className="mt-5 bg-transparent">
+              <Text className="opacity-75">Name</Text>
+              <TextInput
+                className="h-12 p-2 border-2 border-gray-300 rounded-md "
+                placeholder="Name"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="name"
         />
@@ -222,13 +229,16 @@ export default function ModalScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
-              placeholder="Description"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View className="mt-5 bg-transparent">
+              <Text className="opacity-75">Description</Text>
+              <TextInput
+                className="h-12 p-2 border-2 border-gray-300 rounded-md "
+                placeholder="Description"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="description"
         />
@@ -236,18 +246,21 @@ export default function ModalScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <View className="flex flex-row items-center gap-x-2">
-              <TextInput
-                className="flex-1 h-12 p-2 mt-5 border-2 border-gray-300 rounded-md "
-                placeholder="Date"
-                onBlur={onBlur}
-                // onChangeText={onChange}
-                editable={false}
-                value={value.toString()}
-              />
-              {/* Date picker icon button */}
-              <Pressable onPress={openDatePicker} className="mt-5">
-                <Ionicons name="calendar-outline" size={32} color="green" />
+            <View className="mt-5 bg-transparent">
+              <Text className="opacity-75">Expiration Date</Text>
+              <Pressable onPress={openDatePicker}>
+                <View className="flex flex-row items-center bg-transparent gap-x-2">
+                  <TextInput
+                    className="flex-1 h-12 p-2 border-2 border-gray-300 rounded-md "
+                    placeholder="Date"
+                    onBlur={onBlur}
+                    // onChangeText={onChange}
+                    editable={false}
+                    value={value.toString()}
+                  />
+                  {/* Date picker icon button */}
+                  <Ionicons name="ios-calendar-sharp" size={32} color="green" />
+                </View>
               </Pressable>
             </View>
           )}

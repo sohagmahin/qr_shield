@@ -20,6 +20,7 @@ type Item = {
   name: string;
   description: string;
   type: string;
+  date: string;
   data: string;
 };
 
@@ -52,6 +53,7 @@ export default function CodesScreen() {
       <View className="flex-1 bg-transparent">
         <Text className="text-lg font-semibold text-red-400">{item.name}</Text>
         <Text>{item.description}</Text>
+        <Text className="font-medium">Expires on {item.date}</Text>
       </View>
       <View className="bg-transparent">
         <QRCode value={item.data} size={50} />
@@ -67,6 +69,7 @@ export default function CodesScreen() {
       <View className="flex-1 bg-transparent">
         <Text className="text-lg font-semibold text-red-400">{item.name}</Text>
         <Text>{item.description}</Text>
+        <Text className="font-medium">Expires on {item.date}</Text>
       </View>
       <View className="bg-transparent">
         <Barcode

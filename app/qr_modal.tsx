@@ -15,6 +15,7 @@ import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "../constants/Haptics";
 
 type Item = {
   id: number;
@@ -39,9 +40,10 @@ export default function QRModalScreen() {
   };
 
   const showDeleteAlret = () => {
+    Haptics.hapticWarning();
     Alert.alert(
       "Delete",
-      "Are you sure you want to delete this item?",
+      "Are you sure you want to delete this code?",
       [
         {
           text: "Cancel",
@@ -151,16 +153,18 @@ export default function QRModalScreen() {
               </View>
             )}
             <View className="flex items-center justify-center flex-grow">
-              {item.type === "QRCode" ? (
-                <QRCode value={item.data.toString()} size={300} />
-              ) : (
-                <Barcode
-                  format="CODE128"
-                  value={item.data}
-                  text={item.data}
-                  maxWidth={Dimensions.get("window").width / 1.2}
-                />
-              )}
+              <View className="p-2 bg-white">
+                {item.type === "QRCode" ? (
+                  <QRCode value={item.data.toString()} size={300} />
+                ) : (
+                  <Barcode
+                    format="CODE128"
+                    value={item.data}
+                    text={item.data}
+                    maxWidth={Dimensions.get("window").width / 1.2}
+                  />
+                )}
+              </View>
               <Text className="mt-5 text-3xl font-bold">{item.name}</Text>
             </View>
           </View>

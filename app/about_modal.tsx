@@ -81,6 +81,14 @@ const AboutModal = () => {
           Version :{packageJson.version || ""}
         </Text>
       </View>
+      {/* Privacy and policy */}
+      <View className="flex items-center justify-center bg-transparent">
+        <Text className="text-xs opacity-75">
+          Privacy and Policy | Terms of Use
+        </Text>
+
+        <Text className="text-xs opacity-75">© 2024 QR Code Wallet</Text>
+      </View>
     </View>
   );
 };

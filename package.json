@@ -1,5 +1,5 @@
 {
-  "name": "QR_Shield",
+  "name": "qr_code_wallet",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {

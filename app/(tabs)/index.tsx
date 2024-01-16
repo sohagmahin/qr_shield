@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Dimensions,
   Pressable,
   ScrollView,
@@ -8,10 +7,8 @@ import {
 import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { useEffect, useState, useCallback } from "react";
-
-import { Link, router } from "expo-router";
-
+import { useState, useCallback } from "react";
+import { router } from "expo-router";
 import { useBarCodeStore } from "../../stores/useBarCodeStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,12 +22,9 @@ type Item = {
 };
 
 export default function CodesScreen() {
-  const [items, setItems] = useState<Item[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const codes = useBarCodeStore((state) => state.barCode);
-  console.log("zustand codes");
-  console.log(codes);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -92,7 +86,6 @@ export default function CodesScreen() {
     >
       {codes &&
         codes.map((item: any) => {
-          console.log(item);
           return (
             <Pressable
               key={item.id}

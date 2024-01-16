@@ -28,9 +28,7 @@ const ScanScreen = () => {
 
   const handleBarCodeScanned = ({ type, data }: any) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    console.log(data);
-    console.log(type);
+    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     Haptics.hapticSuccess();
 
     // In android qr code is 256

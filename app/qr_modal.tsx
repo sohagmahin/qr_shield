@@ -1,12 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  Platform,
-  TextInput,
-  Button,
-  Alert,
-  Dimensions,
-  useColorScheme,
-} from "react-native";
+import { Platform, Alert, Dimensions, useColorScheme } from "react-native";
 import { Text, View } from "../components/Themed";
 import { router, useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
@@ -27,15 +20,12 @@ type Item = {
 
 export default function QRModalScreen() {
   const [item, setItem] = useState<Item>();
-  // const [item, setItem] = useState();
   const local = useLocalSearchParams();
   const { id } = local;
   const codes = useBarCodeStore((state) => state.barCode);
   const removeBarCode = useBarCodeStore((state) => state.removeBarCode);
 
   const removeItem = (id: number) => {
-    // deleteItem(id);
-    console.log(id);
     removeBarCode(id);
   };
 
@@ -47,7 +37,7 @@ export default function QRModalScreen() {
       [
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
+          onPress: () => {},
           style: "cancel",
         },
 
@@ -65,17 +55,8 @@ export default function QRModalScreen() {
 
   useEffect(() => {
     if (!id) return;
-    // getItem(parseInt(id.toString()));
-    // getItem(parseInt(id.toString())).then((item: any) => {
-    //   console.log("itemss ========>>>>");
-    //   console.log(item);
-    //   setItem(item);
-    // });
-
     codes.forEach((code: any) => {
       if (code.id === id) {
-        console.log("inside qr view");
-        console.log(code);
         setItem(code);
       }
     });

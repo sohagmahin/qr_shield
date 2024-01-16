@@ -1,15 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  Platform,
-  // TextInput,
-  Button,
-  Pressable,
-  Dimensions,
-  useColorScheme,
-} from "react-native";
+import { Platform, Pressable, Dimensions, useColorScheme } from "react-native";
 import uuid from "react-native-uuid";
 import { Text, View, TextInput } from "../components/Themed";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useBarCodeStore } from "../stores/useBarCodeStore";
 import { useEffect, useState } from "react";
@@ -79,8 +72,6 @@ export default function ModalScreen() {
     if (!id) return;
     codes.forEach((code: any) => {
       if (code.id === id) {
-        console.log("inside edit view");
-        console.log(code);
         setEditItem(code);
       }
     });
@@ -108,8 +99,6 @@ export default function ModalScreen() {
   }, [date]);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log("submite data");
-    console.log(data);
     // insertItem(data.name, data.description, "qr", data.code_info);
     if (id) {
       editBarCode({

@@ -79,7 +79,7 @@ export default function QRModalScreen() {
         setItem(code);
       }
     });
-  }, [id]);
+  }, [id, codes]);
 
   const AndroidAppBar = (
     <SafeAreaView>

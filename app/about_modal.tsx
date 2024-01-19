@@ -76,7 +76,7 @@ const AboutModal = () => {
       )}
 
       <View className="flex items-center justify-center bg-transparent">
-        <Text className="text-xl font-bold ">QR Code Wallet</Text>
+        <Text className="text-xl font-bold ">QR Wallet</Text>
         <Text className="text-xs opacity-75">
           Version :{packageJson.version || ""}
         </Text>

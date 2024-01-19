@@ -44,7 +44,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Codes",
+          title: "QR Wallet",
+          headerTitleAlign: "center",
           tabBarIcon: ({ color, focused }) => (
             <View
               className={`flex flex-row items-center px-3 py-2 rounded-full gap-x-2 ${

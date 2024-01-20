@@ -1,4 +1,4 @@
-package com.sohagmahin.qrshield;
+package com.sohagmahin.qrwallet;
 
 import android.os.Build;
 import android.os.Bundle;

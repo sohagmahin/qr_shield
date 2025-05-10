@@ -125,7 +125,7 @@ export default function ModalScreen() {
       });
     }
 
-    alert(`Item ${id ? "edited" : "added"} successfully!`);
+    alert(`Code ${id ? "updated" : "saved"} successfully!`);
 
     if (id) {
       router.back();
@@ -261,9 +261,10 @@ export default function ModalScreen() {
                       />
                       {/* Date picker icon button */}
                       <Ionicons
-                        name="ios-calendar-sharp"
+                        name="calendar-sharp"
                         size={32}
-                        color="green"
+                        color="red"
+                        style={{ opacity: 0.6 }}
                       />
                     </View>
                   </Pressable>

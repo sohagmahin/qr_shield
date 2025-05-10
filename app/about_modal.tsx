@@ -87,7 +87,7 @@ const AboutModal = () => {
           Privacy and Policy | Terms of Use
         </Text>
 
-        <Text className="text-xs opacity-75">© 2024 QR Code Wallet</Text>
+        <Text className="text-xs opacity-75">© 2025 QR Code Wallet</Text>
       </View>
     </View>
   );

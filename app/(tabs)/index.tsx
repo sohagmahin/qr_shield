@@ -5,6 +5,7 @@ import {
   RefreshControl,
   useColorScheme,
   Modal,
+  TextInput,
 } from "react-native";
 import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
@@ -54,12 +55,23 @@ export default function CodesScreen() {
   const [sortType, setSortType] = useState<SortType>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const colorScheme = useColorScheme();
 
   const codes = useBarCodeStore((state) => state.barCode);
 
-  const sortedCodes = useMemo(() => {
-    return [...codes].sort((a, b) => {
+  const filteredAndSortedCodes = useMemo(() => {
+    // First filter the codes based on search query
+    const filtered = codes.filter((item: Item) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        item.name.toLowerCase().includes(searchLower) ||
+        item.description.toLowerCase().includes(searchLower)
+      );
+    });
+
+    // Then sort the filtered results
+    return filtered.sort((a: Item, b: Item) => {
       if (sortType === "name") {
         const comparison = a.name.localeCompare(b.name);
         return sortDirection === "asc" ? comparison : -comparison;
@@ -70,7 +82,7 @@ export default function CodesScreen() {
         return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
       }
     });
-  }, [codes, sortType, sortDirection]);
+  }, [codes, sortType, sortDirection, searchQuery]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -151,7 +163,35 @@ export default function CodesScreen() {
   return (
     <>
       {codes && codes.length === 0 && emptyPlaceholder}
-      <View className="flex-row justify-end px-4 pt-2 bg-transparent">
+      <View className="flex-row items-center gap-2 px-4 pt-2 bg-transparent">
+        <View className="flex-row items-center flex-1 px-3 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <Ionicons
+            name="search"
+            size={20}
+            color={colorScheme === "dark" ? "white" : "gray"}
+          />
+          <TextInput
+            className="flex-1 px-2 py-2 text-black dark:text-white"
+            placeholder="Search codes..."
+            placeholderTextColor={colorScheme === "dark" ? "gray" : "gray"}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <Pressable
+              onPress={() => {
+                hapticFeedbackLight();
+                setSearchQuery("");
+              }}
+            >
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={colorScheme === "dark" ? "white" : "gray"}
+              />
+            </Pressable>
+          )}
+        </View>
         <Pressable
           onPress={() => {
             hapticFeedbackLight();
@@ -211,21 +251,36 @@ export default function CodesScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {sortedCodes.map((item: any) => {
-          return (
-            <Pressable
-              key={item.id}
-              onPress={() => {
-                router.push({
-                  pathname: "/qr_modal",
-                  params: { id: item.id },
-                });
-              }}
-            >
-              {item.type === "QRCode" ? qrCodes(item) : barCodes(item)}
-            </Pressable>
-          );
-        })}
+        {filteredAndSortedCodes.length === 0 ? (
+          <View className="flex items-center justify-center py-8 opacity-50">
+            <Ionicons
+              name="search"
+              size={48}
+              color={colorScheme === "dark" ? "white" : "black"}
+            />
+            <Text className="mt-2 text-lg text-center">
+              {searchQuery
+                ? "No codes found matching your search"
+                : "No codes available"}
+            </Text>
+          </View>
+        ) : (
+          filteredAndSortedCodes.map((item: any) => {
+            return (
+              <Pressable
+                key={item.id}
+                onPress={() => {
+                  router.push({
+                    pathname: "/qr_modal",
+                    params: { id: item.id },
+                  });
+                }}
+              >
+                {item.type === "QRCode" ? qrCodes(item) : barCodes(item)}
+              </Pressable>
+            );
+          })
+        )}
       </ScrollView>
     </>
   );

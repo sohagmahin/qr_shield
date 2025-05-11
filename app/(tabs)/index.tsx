@@ -4,15 +4,20 @@ import {
   ScrollView,
   RefreshControl,
   useColorScheme,
+  Modal,
+  TextInput,
 } from "react-native";
 import { Text, View } from "../../components/Themed";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { router } from "expo-router";
 import { useBarCodeStore } from "../../stores/useBarCodeStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Path } from "react-native-svg";
+import { Ionicons } from "@expo/vector-icons";
+import { hapticFeedbackLight } from "../../constants/Haptics";
+import React from "react";
 
 type Item = {
   id: number;
@@ -23,10 +28,61 @@ type Item = {
   data: string;
 };
 
+type SortType = "name" | "date";
+type SortDirection = "asc" | "desc";
+
+type SortOption = {
+  label: string;
+  type: SortType;
+  direction: SortDirection;
+  icon: keyof typeof Ionicons.glyphMap;
+};
+
+const sortOptions: SortOption[] = [
+  { label: "Name (A-Z)", type: "name", direction: "asc", icon: "text" },
+  { label: "Name (Z-A)", type: "name", direction: "desc", icon: "text" },
+  { label: "Date (Old-New)", type: "date", direction: "asc", icon: "calendar" },
+  {
+    label: "Date (New-Old)",
+    type: "date",
+    direction: "desc",
+    icon: "calendar",
+  },
+];
+
 export default function CodesScreen() {
   const [refreshing, setRefreshing] = useState(false);
+  const [sortType, setSortType] = useState<SortType>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const colorScheme = useColorScheme();
 
   const codes = useBarCodeStore((state) => state.barCode);
+
+  const filteredAndSortedCodes = useMemo(() => {
+    // First filter the codes based on search query
+    const filtered = codes.filter((item: Item) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        item.name.toLowerCase().includes(searchLower) ||
+        item.description.toLowerCase().includes(searchLower)
+      );
+    });
+
+    // Then sort the filtered results
+    return filtered.sort((a: Item, b: Item) => {
+      if (sortType === "name") {
+        const comparison = a.name.localeCompare(b.name);
+        return sortDirection === "asc" ? comparison : -comparison;
+      } else {
+        // Sort by date
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      }
+    });
+  }, [codes, sortType, sortDirection, searchQuery]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -34,6 +90,13 @@ export default function CodesScreen() {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  const handleSort = (option: SortOption) => {
+    hapticFeedbackLight();
+    setSortType(option.type);
+    setSortDirection(option.direction);
+    setShowSortMenu(false);
+  };
 
   const clearStorage = async () => {
     await AsyncStorage.clear();
@@ -93,32 +156,131 @@ export default function CodesScreen() {
     </View>
   );
 
+  const currentSortOption = sortOptions.find(
+    (option) => option.type === sortType && option.direction === sortDirection
+  );
+
   return (
     <>
       {codes && codes.length === 0 && emptyPlaceholder}
+      <View className="flex-row items-center gap-2 px-4 pt-2 bg-transparent">
+        <View className="flex-row items-center flex-1 px-3 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <Ionicons
+            name="search"
+            size={20}
+            color={colorScheme === "dark" ? "white" : "gray"}
+          />
+          <TextInput
+            className="flex-1 px-2 py-2 text-black dark:text-white"
+            placeholder="Search codes..."
+            placeholderTextColor={colorScheme === "dark" ? "gray" : "gray"}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <Pressable
+              onPress={() => {
+                hapticFeedbackLight();
+                setSearchQuery("");
+              }}
+            >
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={colorScheme === "dark" ? "white" : "gray"}
+              />
+            </Pressable>
+          )}
+        </View>
+        <Pressable
+          onPress={() => {
+            hapticFeedbackLight();
+            setShowSortMenu(true);
+          }}
+          className="flex-row items-center px-3 py-2 bg-red-400 rounded-lg"
+        >
+          <Ionicons name="options" size={20} color="white" />
+          <Text className="ml-2 font-medium text-white">
+            {currentSortOption?.label || "Sort"}
+          </Text>
+        </Pressable>
+      </View>
+
+      <Modal
+        visible={showSortMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSortMenu(false)}
+      >
+        <Pressable
+          className="flex-1 bg-black/50"
+          onPress={() => setShowSortMenu(false)}
+        >
+          <View className="absolute right-4 top-16 w-48 bg-white dark:bg-[#121212] rounded-lg shadow-lg overflow-hidden">
+            {sortOptions.map((option, index) => (
+              <Pressable
+                key={option.label}
+                onPress={() => handleSort(option)}
+                className={`flex-row items-center px-4 py-3 ${
+                  index !== sortOptions.length - 1
+                    ? "border-b border-gray-200 dark:border-gray-700"
+                    : ""
+                } ${
+                  option.type === sortType && option.direction === sortDirection
+                    ? "bg-red-50 dark:bg-red-900/20"
+                    : ""
+                }`}
+              >
+                <Ionicons
+                  name={option.icon}
+                  size={20}
+                  color={colorScheme === "dark" ? "white" : "black"}
+                />
+                <Text className="ml-3 text-black dark:text-white">
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
+
       <ScrollView
-        className="m-4"
+        className="px-4 py-2"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {codes.map((item: any) => {
-          return (
-            <Pressable
-              key={item.id}
-              onPress={() => {
-                router.push({
-                  pathname: "/qr_modal",
-                  params: { id: item.id },
-                });
-              }}
-            >
-              {item.type === "QRCode" ? qrCodes(item) : barCodes(item)}
-            </Pressable>
-          );
-        })}
-
-        {/* {barCodes} */}
+        {filteredAndSortedCodes.length === 0 ? (
+          <View className="flex items-center justify-center py-8 opacity-50">
+            <Ionicons
+              name="search"
+              size={48}
+              color={colorScheme === "dark" ? "white" : "black"}
+            />
+            <Text className="mt-2 text-lg text-center">
+              {searchQuery
+                ? "No codes found matching your search"
+                : "No codes available"}
+            </Text>
+          </View>
+        ) : (
+          filteredAndSortedCodes.map((item: any) => {
+            return (
+              <Pressable
+                key={item.id}
+                onPress={() => {
+                  router.push({
+                    pathname: "/qr_modal",
+                    params: { id: item.id },
+                  });
+                }}
+              >
+                {item.type === "QRCode" ? qrCodes(item) : barCodes(item)}
+              </Pressable>
+            );
+          })
+        )}
       </ScrollView>
     </>
   );

@@ -6,20 +6,22 @@ import {
   Button,
   Pressable,
   Platform,
+  useColorScheme,
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "../../constants/Haptics";
+import { Ionicons } from "@expo/vector-icons";
 
 const ScanScreen = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
-
       setHasPermission(status === "granted");
     };
 
@@ -46,10 +48,18 @@ const ScanScreen = () => {
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return (
+      <View className="items-center justify-center flex-1">
+        <Text className="text-lg">Requesting camera permission...</Text>
+      </View>
+    );
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return (
+      <View className="items-center justify-center flex-1">
+        <Text className="text-lg text-red-400">No access to camera</Text>
+      </View>
+    );
   }
 
   const pickImage = async () => {
@@ -88,22 +98,38 @@ const ScanScreen = () => {
         />
       )}
 
-      <View className="absolute gap-2 bottom-32 ">
+      <View className="absolute w-full gap-3 px-4 bottom-32">
         <Pressable
-          className="self-center p-4 bg-red-400 rounded-full"
-          onPress={() => setScanned((prev) => !prev)}
+          onPress={() => {
+            Haptics.hapticFeedbackLight();
+            setScanned((prev) => !prev);
+          }}
+          className="flex-row items-center justify-center p-4 bg-red-400 shadow-lg rounded-xl"
         >
-          <Text className="text-xl font-semibold text-white ">
-            {scanned ? "Tap to open camera" : "Stop Camera Scan"}
+          <Ionicons
+            name={scanned ? "camera" : "camera-outline"}
+            size={24}
+            color="white"
+          />
+          <Text className="ml-2 text-xl font-semibold text-white">
+            {scanned ? "Start Scanning" : "Stop Scanning"}
           </Text>
         </Pressable>
 
         <Pressable
-          className="self-center p-4 bg-red-400 rounded-full"
-          onPress={pickImage}
+          onPress={() => {
+            Haptics.hapticFeedbackLight();
+            pickImage();
+          }}
+          className="flex-row items-center justify-center p-4 bg-white shadow-lg dark:bg-gray-800 rounded-xl"
         >
-          <Text className="text-xl font-semibold text-white ">
-            Get from gallery
+          <Ionicons
+            name="images"
+            size={24}
+            color={colorScheme === "dark" ? "white" : "black"}
+          />
+          <Text className="ml-2 text-xl font-semibold text-black dark:text-white">
+            Scan from Photos
           </Text>
         </Pressable>
       </View>

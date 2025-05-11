@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search feature for better code scanning and management
 - Sort by option for organizing scanned codes
 - UI improvements and refinements
+- Add android 14 support
 
 ## [1.0.0] - 2023-11-15
 
